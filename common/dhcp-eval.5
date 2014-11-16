@@ -381,6 +381,14 @@ is syslogged to the debug level (this is considered dhcpd.conf debugging
 information).
 .RE
 .PP
+.B client-address
+.RS 0.25i
+In any context where there is a client request being processed, this data
+expression returns the address of the client, as determined by the packet. 
+I have no idea what will be returned when a DHCP relay is involved, but I
+wouldn't be surprised if it's the wrong thing.
+.RE
+.PP
 .B binary-to-ascii (\fInumeric-expr1\fB, \fInumeric-expr2\fB,
 .B \fIdata-expr1\fB,\fR \fIdata-expr2\fB)\fR
 .RS 0.25i

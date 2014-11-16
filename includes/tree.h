@@ -157,6 +157,7 @@ enum expr_op {
 	expr_known,
 	expr_reverse,
 	expr_leased_address,
+	expr_client_address,
 	expr_binary_to_ascii,
 	expr_config_option,
 	expr_host_decl_name,

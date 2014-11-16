@@ -367,7 +367,8 @@ enum dhcp_token {
 	TOKEN_INFINIBAND = 668,
 	POOL6 = 669,
 	V6RELAY = 670,
-	V6RELOPT = 671
+	V6RELOPT = 671,
+	CLIENT_ADDRESS = 672
 };
 
 #define is_identifier(x)	((x) >= FIRST_TOKEN &&	\

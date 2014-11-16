@@ -819,6 +819,8 @@ intern(char *atom, enum dhcp_token dfv) {
 			return CHECK;
 		if (!strcasecmp(atom + 1, "iaddr"))
 			return CIADDR;
+		if (!strcasecmp(atom + 1, "lient-address"))
+			return CLIENT_ADDRESS;
 		if (isascii(atom[1]) &&
 		    tolower((unsigned char)atom[1]) == 'l') {
 			if (!strcasecmp(atom + 2, "ass"))
