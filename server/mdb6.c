@@ -1461,6 +1461,28 @@ move_lease_to_inactive(struct ipv6_pool *pool, struct iasubopt *lease,
 	old_heap_index = lease->heap_index;
 	insert_result = isc_heap_insert(pool->inactive_timeouts, lease);
 	if (insert_result == ISC_R_SUCCESS) {
+		struct option *option = NULL;
+		struct option_cache *oc = NULL;
+		struct option_state *in_options = NULL;
+
+		option_state_allocate(&in_options, MDL);
+		option_cache_allocate(&oc, MDL);
+		option_name_hash_lookup(&option, dhcpv6_universe.name_hash, "ia-prefix", 0, MDL);
+
+		oc->option = option;
+		oc->next = NULL;
+		oc->expression = NULL;
+		oc->data.len = IAPREFIX_OFFSET;
+		buffer_allocate(&oc->data.buffer, oc->data.len, MDL);
+		oc->data.data = oc->data.buffer->data;
+		oc->data.terminated = 0;
+
+		putULong(oc->data.buffer->data, 0);
+		putULong(oc->data.buffer->data + 4, 0);
+		oc->data.buffer->data[8] = lease->plen;
+		memcpy(oc->data.buffer->data + 9, &lease->addr, 16);
+
+		save_option(&dhcpv6_universe, in_options, oc);
 		/*
 		 * Handle expire and release statements
 		 * To get here we must be active and have done a commit so
@@ -1472,7 +1494,7 @@ move_lease_to_inactive(struct ipv6_pool *pool, struct iasubopt *lease,
 		if (lease->on_star.on_expiry != NULL) {
 			if (state == FTS_EXPIRED) {
 				execute_statements(NULL, NULL, NULL,
-						   NULL, NULL, NULL,
+						   NULL, in_options, NULL,
 						   &lease->scope,
 						   lease->on_star.on_expiry,
 						   &lease->on_star);
@@ -1484,7 +1506,7 @@ move_lease_to_inactive(struct ipv6_pool *pool, struct iasubopt *lease,
 		if (lease->on_star.on_release != NULL) {
 			if (state == FTS_RELEASED) {
 				execute_statements(NULL, NULL, NULL,
-						   NULL, NULL, NULL,
+						   NULL, in_options, NULL,
 						   &lease->scope,
 						   lease->on_star.on_release,
 						   &lease->on_star);
@@ -1492,6 +1514,10 @@ move_lease_to_inactive(struct ipv6_pool *pool, struct iasubopt *lease,
 			executable_statement_dereference
 				(&lease->on_star.on_release, MDL);
 		}
+
+		buffer_dereference(&oc->data.buffer, MDL);
+		option_state_dereference(&in_options, MDL);
+		option_cache_dereference(&oc, MDL);
 
 #if defined (NSUPDATE)
 		/* Process events upon expiration. */
