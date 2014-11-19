@@ -1841,7 +1841,7 @@ int evaluate_data_expression (result, packet, lease, client_state,
 				  "with this context.");
 			return 0;
 		}
-		result -> len = strlen(piaddr(packet -> client_addr) + 1);
+		result -> len = strlen(piaddr(packet -> client_addr)) + 1;
 		if (buffer_allocate (&result -> buffer, result -> len,
 				     file, line)) {
 			result -> data = &result -> buffer -> data [0];
